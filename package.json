@@ -1,0 +1,24 @@
+{
+  "name": "covid-19-data",
+  "version": "1.0.0",
+  "description": "Transforming the CSSEGISandData/COVID-19 source data into a consistant format",
+  "repository": "https://github.com/pixelscript/covid-19-data-processor",
+  "license": "MIT",
+  "main": "dist/main.js",
+  "scripts": {
+    "build-ts": "tsc",
+    "start": "npm run serve",
+    "serve": "node dist/main.js",
+    "watch-node": "nodemon dist/main.js",
+    "watch-ts": "tsc -w"
+  },
+  "author": "pixelscript",
+  "devDependencies": {
+    "@types/lodash": "^4.14.149",
+    "@types/node": "^13.9.0",
+    "lodash": "^4.17.15",
+    "nodemon": "^2.0.2",
+    "tslint": "^6.1.0",
+    "typescript": "^3.8.3"
+  }
+}
