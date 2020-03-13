@@ -9,7 +9,7 @@
     "build-ts": "tsc",
     "start": "npm run serve",
     "serve": "node dist/main.js",
-    "watch-node": "nodemon dist/main.js",
+    "watch-node": "nodemon --ignore 'data/*' dist/main.js",
     "watch-ts": "tsc -w"
   },
   "author": "pixelscript",

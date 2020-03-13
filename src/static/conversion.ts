@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import {isoMap, countries} from './countries';
+import { isoMap, countries } from './countries';
 export interface Replacement {
   from: string;
   to: string;
@@ -28,8 +28,8 @@ export interface Country {
   name: string;
   codeA3: string;
   codeA2: string;
-  data: Array<Number>;
-  total: Number;
+  data: Array<any>;
+  totals: Array<any>;
 }
 
 export let group = [
@@ -99,7 +99,7 @@ export function processReplace(rowArray: Array<Array<any>>) {
 export function processFlatten(rowArray: Array<Array<any>>) {
   let newArr: Array<Array<any>> = [...rowArray];
   let lastCountry: string = '';
-  sort(newArr);
+  sortName(newArr);
   for (let i = 0; i < newArr.length; i++) {
     const row = newArr[i];
     newArr[i] = stringSeriesToNumberSeries(row);
@@ -111,30 +111,48 @@ export function processFlatten(rowArray: Array<Array<any>>) {
     }
     lastCountry = country;
   }
+  sortValue(newArr);
   return newArr;
 }
 
-export function rowsToCountries(rowArray: Array<Array<any>>) {
+export function rowsToCountries(rowArray: Array<Array<any>>, dataName: string) {
   const countries: Array<Country> = [];
   rowArray.forEach(row => {
-    countries.push(rowToCountry(row));
+    const cnt = rowToCountry(row, dataName, [...rowArray[0]]);
+    if (cnt) {
+      countries.push(cnt);
+    }
   });
   return countries;
 }
 
-function rowToCountry(arr: Array<any>) {
+function rowToCountry(arr: Array<any>, dataName: string, topValue: any) {
   const cnt = _.find(countries, { name: arr[1] });
-  const data = arr.splice(4);
+  const data = formatData(arr.slice(4), dataName, topValue);
+  const totals: any = {};
+  totals[dataName] = data[data.length - 1][dataName].value;
   if (cnt) {
     const country: Country = {
       name: arr[1],
       codeA3: cnt['alpha-3'],
       codeA2: isoMap[cnt['alpha-3']],
       data,
-      total: data[data.length-1]
+      totals
     };
     return country;
   }
+}
+
+function formatData(arr: Array<any>, dataName: string, topValue: Array<any>) {
+  const formatted: Array<any> = [];
+  const maxLog = Math.max(0,Math.log10(topValue[topValue.length-1]));
+  arr.forEach((value: number) => {
+    const obj: any = {};
+    const log = Math.max(0,Math.log10(value));
+    obj[dataName] = { value, log, logPercent: (log / maxLog) * 100 };
+    formatted.push(obj);
+  });
+  return formatted;
 }
 
 function addRowsTogether(row1: Array<any>, row2: Array<any>) {
@@ -151,10 +169,18 @@ function stringSeriesToNumberSeries(arr: Array<any>) {
   return arr;
 }
 
-function sort(arr: Array<Array<any>>) {
+function sortName(arr: Array<Array<any>>) {
   arr.sort((one, two) => {
     const a = one[1];
     const b = two[1];
     return a.localeCompare(b, 'en', { sensitivity: 'base' });
+  });
+}
+
+function sortValue(arr: Array<Array<any>>) {
+  arr.sort((one, two) => {
+    const a = one[one.length-1];
+    const b = two[two.length-1];
+    return a < b ? 1 : -1;
   });
 }

@@ -21,6 +21,11 @@
           "es2015"
       ]
   },
+
+  "exclude": [
+    "node_modules/**/*",
+    "data/*"
+  ],
   "include": [
       "src/**/*"
   ]

@@ -21,14 +21,13 @@ function processData(data: string){
   tableBody = processReplace(tableBody);
   tableBody = processFlatten(tableBody);
   
-  let countries: Array<Country> = rowsToCountries(tableBody);
-  countries = _.sortBy(countries, ['total']).reverse();
+  let countries: Array<Country> = rowsToCountries(tableBody, 'cases');
   return {
     series,
     countries
   }
 }
 function writeToFile(data: object){
-  fs.writeFileSync('../data.json', JSON.stringify(data, null, 2));
+  fs.writeFileSync('data/data.json', JSON.stringify(data));
   console.log('DONE');
 }
