@@ -1,5 +1,5 @@
 import _ from 'lodash';
-
+import {isoMap, countries} from './countries';
 export interface Replacement {
   from: string;
   to: string;
@@ -23,6 +23,14 @@ export let replace: Array<Replacement> = [
     to: 'United Kingdom of Great Britain and Northern Ireland'
   }
 ];
+
+export interface Country {
+  name: string;
+  codeA3: string;
+  codeA2: string;
+  data: Array<Number>;
+  total: Number;
+}
 
 export let group = [
   { name: 'US', group: 'us-state', region: 'Alaska' },
@@ -91,10 +99,10 @@ export function processReplace(rowArray: Array<Array<any>>) {
 export function processFlatten(rowArray: Array<Array<any>>) {
   let newArr: Array<Array<any>> = [...rowArray];
   let lastCountry: string = '';
-  sort(rowArray);
+  sort(newArr);
   for (let i = 0; i < newArr.length; i++) {
     const row = newArr[i];
-    newArr[i] = stringToValues(row);
+    newArr[i] = stringSeriesToNumberSeries(row);
     const country = row[1];
     if (lastCountry === country) {
       newArr[i - 1] = addRowsTogether(newArr[i - 1], row);
@@ -106,19 +114,39 @@ export function processFlatten(rowArray: Array<Array<any>>) {
   return newArr;
 }
 
-function addRowsTogether(
-  row1: Array<any>,
-  row2: Array<any>
-) {
+export function rowsToCountries(rowArray: Array<Array<any>>) {
+  const countries: Array<Country> = [];
+  rowArray.forEach(row => {
+    countries.push(rowToCountry(row));
+  });
+  return countries;
+}
+
+function rowToCountry(arr: Array<any>) {
+  const cnt = _.find(countries, { name: arr[1] });
+  const data = arr.splice(4);
+  if (cnt) {
+    const country: Country = {
+      name: arr[1],
+      codeA3: cnt['alpha-3'],
+      codeA2: isoMap[cnt['alpha-3']],
+      data,
+      total: data[data.length-1]
+    };
+    return country;
+  }
+}
+
+function addRowsTogether(row1: Array<any>, row2: Array<any>) {
   for (let i = 4; i < row1.length; i++) {
     row1[i] = Number(row1[i]) + Number(row2[i]);
   }
   return row1;
 }
 
-function stringToValues(arr: Array<any>) {
+function stringSeriesToNumberSeries(arr: Array<any>) {
   for (let i = 4; i < arr.length; i++) {
-    arr[i] = Number(i);
+    arr[i] = Number(arr[i]);
   }
   return arr;
 }
