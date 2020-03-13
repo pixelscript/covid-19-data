@@ -29,7 +29,6 @@ export interface Country {
   codeA3: string;
   codeA2: string;
   data: Array<any>;
-  totals: Array<any>;
 }
 
 export let group = [
@@ -111,14 +110,36 @@ export function processFlatten(rowArray: Array<Array<any>>) {
     }
     lastCountry = country;
   }
-  sortValue(newArr);
   return newArr;
 }
 
-export function rowsToCountries(rowArray: Array<Array<any>>, dataName: string) {
+const DIMENSIONS = {
+  RECOVERIES: 'recoveries',
+  CASES: 'cases',
+  DEATHS: 'deaths'
+}
+
+export function topRows(rowArray: Array<Array<any>>){
+  let cases;
+  let deaths;
+  let recoveries;
+  sortValue(rowArray, DIMENSIONS.RECOVERIES);
+  recoveries = rowArray[0][rowArray[0].length-1][DIMENSIONS.RECOVERIES].value;
+  sortValue(rowArray, DIMENSIONS.DEATHS);
+  deaths = rowArray[0][rowArray[0].length-1][DIMENSIONS.DEATHS].value;
+  sortValue(rowArray, DIMENSIONS.CASES);
+  cases = rowArray[0][rowArray[0].length-1][DIMENSIONS.CASES].value;
+  return {
+    cases,
+    deaths,
+    recoveries
+  }
+}
+
+export function rowsToCountries(rowArray: Array<Array<any>>, topItems: Object) {
   const countries: Array<Country> = [];
   rowArray.forEach(row => {
-    const cnt = rowToCountry(row, dataName, [...rowArray[0]]);
+    const cnt = rowToCountry(row, topItems);
     if (cnt) {
       countries.push(cnt);
     }
@@ -126,33 +147,40 @@ export function rowsToCountries(rowArray: Array<Array<any>>, dataName: string) {
   return countries;
 }
 
-function rowToCountry(arr: Array<any>, dataName: string, topValue: any) {
+function rowToCountry(arr: Array<any>, topItems: Object) {
   const cnt = _.find(countries, { name: arr[1] });
-  const data = formatData(arr.slice(4), dataName, topValue);
-  const totals: any = {};
-  totals[dataName] = data[data.length - 1][dataName].value;
+  const data = formatData(arr.slice(4), topItems);
   if (cnt) {
     const country: Country = {
       name: arr[1],
       codeA3: cnt['alpha-3'],
       codeA2: isoMap[cnt['alpha-3']],
-      data,
-      totals
+      data
     };
     return country;
   }
 }
 
-function formatData(arr: Array<any>, dataName: string, topValue: Array<any>) {
+function formatData(arr: Array<any>, topValues: any) {
   const formatted: Array<any> = [];
-  const maxLog = Math.max(0,Math.log10(topValue[topValue.length-1]));
-  arr.forEach((value: number) => {
-    const obj: any = {};
-    const log = Math.max(0,Math.log10(value));
-    obj[dataName] = { value, log, logPercent: (log / maxLog) * 100 };
-    formatted.push(obj);
+  const maxCasesLog = safeLog(topValues.cases);
+  const maxRecoveriesLog = safeLog(topValues.recoveries);
+  const maxDeathsLog = safeLog(topValues.deaths);
+  arr.forEach((value: any) => {
+    value[DIMENSIONS.CASES].log = safeLog(value[DIMENSIONS.CASES].value);
+    value[DIMENSIONS.CASES].logPercent = (value[DIMENSIONS.CASES].log / maxCasesLog) * 100;
+    value[DIMENSIONS.RECOVERIES].log = safeLog(value[DIMENSIONS.RECOVERIES].value);
+    value[DIMENSIONS.RECOVERIES].logPercent = (value[DIMENSIONS.RECOVERIES].log / maxRecoveriesLog) * 100;
+    value[DIMENSIONS.DEATHS].log = safeLog(value[DIMENSIONS.DEATHS].value);
+    value[DIMENSIONS.DEATHS].logPercent = (value[DIMENSIONS.DEATHS].log / maxDeathsLog) * 100;
+    formatted.push(value);
   });
+  console.log(formatted);
   return formatted;
+}
+
+function safeLog(n: number) {
+  return Math.max(0,Math.log10(n));
 }
 
 function addRowsTogether(row1: Array<any>, row2: Array<any>) {
@@ -177,10 +205,10 @@ function sortName(arr: Array<Array<any>>) {
   });
 }
 
-function sortValue(arr: Array<Array<any>>) {
+function sortValue(arr: Array<Array<any>>, path:string) {
   arr.sort((one, two) => {
-    const a = one[one.length-1];
-    const b = two[two.length-1];
+    const a = one[one.length-1][path].value;
+    const b = two[two.length-1][path].value;
     return a < b ? 1 : -1;
   });
 }
