@@ -88,6 +88,59 @@ export let group = [
   { name: 'US', group: 'us-state', region: 'Wyoming' }
 ];
 
+export function processData(results: Array<string>) {
+  let source: Array<any> = [];
+  let series: Array<string>;
+  results.forEach((data) => {
+    const rowString: Array<string> = data.split('\n');
+    const rowArray: Array<Array<string>> = [];
+    rowString.forEach((row, index) => {
+      rowArray[index] = row.split(/,(?=\S)|:/);
+    });
+    const tableHeader = rowArray[0];
+    const labels = tableHeader.splice(4);
+    let tableBody = rowArray.splice(1);
+    tableBody = processReplace(tableBody);
+    tableBody = processFlatten(tableBody);
+    source.push(tableBody);
+    if (!series) {
+      series = labels;
+    }
+  });
+  const consolidatedCountries: Array<any> = source[0];
+  consolidatedCountries.forEach((data, index, arr) => {
+    for (let i = 4; i < data.length; i++) {
+      data[i] = {
+        cases: { value: Number(data[i]) },
+        deaths: { value: Number(source[1][index][i]) },
+        recoveries: { value: Number(source[2][index][i]) }
+      };
+    }
+  });
+  const countries = rowsToCountries(consolidatedCountries, topRows(consolidatedCountries));
+
+  const totals: Array<any> = [];
+  series.forEach((date, index) => {
+    const total = {
+      cases: 0,
+      deaths: 0,
+      recoveries: 0
+    };
+    countries.forEach((cnt) => {
+      total.cases += cnt.data[index].cases.value;
+      total.deaths += cnt.data[index].deaths.value;
+      total.recoveries += cnt.data[index].recoveries.value;
+    });
+    totals.push(total);
+  })
+
+  return {
+    series,
+    countries,
+    totals
+  }
+}
+
 export function processReplace(rowArray: Array<Array<any>>) {
   rowArray.forEach((row, index, arr) => {
     const found = _.find(replace, { from: row[1] });
