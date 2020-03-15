@@ -247,7 +247,8 @@ export const countries = [
   { name: 'Western Sahara', 'alpha-3': 'ESH', 'country-code': '732' },
   { name: 'Yemen', 'alpha-3': 'YEM', 'country-code': '887' },
   { name: 'Zambia', 'alpha-3': 'ZMB', 'country-code': '894' },
-  { name: 'Zimbabwe', 'alpha-3': 'ZWE', 'country-code': '716' }
+  { name: 'Zimbabwe', 'alpha-3': 'ZWE', 'country-code': '716' },
+  { name: 'Cruise Ship', 'alpha-3': 'NONE', 'country-code': 'NONE' }
 ];
 type map<T = Object, K = any> = T & {
   [key: string]: K;

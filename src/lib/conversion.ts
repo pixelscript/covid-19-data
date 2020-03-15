@@ -10,10 +10,13 @@ export let replace: Array<Replacement> = [
   { from: 'US', to: 'United States of America' },
   { from: 'Brunei', to: 'Brunei Darussalam' },
   { from: 'Iran', to: 'Iran (Islamic Republic of)' },
+  { from: 'Curacao', to: 'Curaçao' },
   { from: 'Taiwan*', to: 'Taiwan, Province of China' },
   { from: 'Vietnam', to: 'Viet Nam' },
+  { from: 'occupied Palestinian territory', to: 'Palestine, State of' },
   { from: 'Russia', to: 'Russian Federation' },
   { from: 'Moldova', to: 'Moldova, Republic of' },
+  { from: 'Venezuela', to: 'Venezuela (Bolivarian Republic of)' },
   { from: 'Bolivia', to: 'Bolivia (Plurinational State of)' },
   { from: 'Congo (Kinshasa)', to: 'Congo, Democratic Republic of the' },
   { from: "Cote d'Ivoire", to: "Côte d'Ivoire" },
@@ -158,6 +161,8 @@ function rowToCountry(arr: Array<any>, topItems: Object) {
       data
     };
     return country;
+  } else {
+    console.warn('Could not find country: '+arr[1])
   }
 }
 
@@ -175,7 +180,6 @@ function formatData(arr: Array<any>, topValues: any) {
     value[DIMENSIONS.DEATHS].logPercent = (value[DIMENSIONS.DEATHS].log / maxDeathsLog) * 100;
     formatted.push(value);
   });
-  console.log(formatted);
   return formatted;
 }
 
