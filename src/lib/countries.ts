@@ -249,7 +249,12 @@ export const countries = [
   { name: 'Zambia', 'alpha-3': 'ZMB', 'country-code': '894' },
   { name: 'Zimbabwe', 'alpha-3': 'ZWE', 'country-code': '716' },
   { name: 'Cruise Ship', 'alpha-3': 'NONE', 'country-code': 'NONE' },
-  { name: 'Kosovo', 'alpha-3': 'XKX', 'country-code': 'NONE	' }
+  { name: 'Diamond Princess', 'alpha-3': 'NONE', 'country-code': 'NONE' },
+  { name: 'MS Zaandam', 'alpha-3': 'NONE', 'country-code': 'NONE' },
+  { name: 'Kosovo', 'alpha-3': 'XKX', 'country-code': 'NONE' },
+  { name: 'Burma', 'alpha-3': 'BUR', 'country-code': '104' },
+  { name: 'West Bank and Gaza', 'alpha-3': 'WST', 'country-code': 'NONE' },
+  { name: 'Laos', 'alpha-3': 'LAO', 'country-code': 'NONE' }
 ];
 type map<T = Object, K = any> = T & {
   [key: string]: K;
@@ -284,6 +289,8 @@ export const isoMap: map = {
   BOL: "BO",
   BIH: "BA",
   BWA: "BW",
+  BUR: "BU",
+  WST: "WB",
   BVT: "BV",
   BRA: "BR",
   VGB: "VG",

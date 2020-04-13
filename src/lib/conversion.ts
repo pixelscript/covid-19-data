@@ -182,19 +182,19 @@ export function processFlatten(rowArray: Array<Array<any>>) {
 }
 
 const DIMENSIONS = {
-  RECOVERIES: 'recoveries',
   CASES: 'cases',
-  DEATHS: 'deaths'
+  DEATHS: 'deaths',
+  RECOVERIES: 'recoveries'
 }
 
 export function topRows(rowArray: Array<Array<any>>){
   let cases;
   let deaths;
   let recoveries;
-  sortValue(rowArray, DIMENSIONS.RECOVERIES);
-  recoveries = rowArray[0][rowArray[0].length-1][DIMENSIONS.RECOVERIES].value;
   sortValue(rowArray, DIMENSIONS.DEATHS);
   deaths = rowArray[0][rowArray[0].length-1][DIMENSIONS.DEATHS].value;
+  sortValue(rowArray, DIMENSIONS.RECOVERIES);
+  recoveries = rowArray[0][rowArray[0].length-1][DIMENSIONS.RECOVERIES].value;
   sortValue(rowArray, DIMENSIONS.CASES);
   cases = rowArray[0][rowArray[0].length-1][DIMENSIONS.CASES].value;
   return {
@@ -234,19 +234,19 @@ function rowToCountry(arr: Array<any>, topItems: Object) {
 function formatData(arr: Array<any>, topValues: any) {
   const formatted: Array<any> = [];
   const maxCasesLog = safeLog(topValues.cases);
-  const maxRecoveriesLog = safeLog(topValues.recoveries);
   const maxDeathsLog = safeLog(topValues.deaths);
+  const maxRecoveriesLog = safeLog(topValues.recoveries);
   let previousValue = arr[0];
   arr.forEach((value: any) => {
     value[DIMENSIONS.CASES].diff = value[DIMENSIONS.CASES].value - previousValue[DIMENSIONS.CASES].value;
     value[DIMENSIONS.CASES].log = safeLog(value[DIMENSIONS.CASES].value);
     value[DIMENSIONS.CASES].logPercent = (value[DIMENSIONS.CASES].log / maxCasesLog) * 100;
-    value[DIMENSIONS.RECOVERIES].diff = value[DIMENSIONS.RECOVERIES].value - previousValue[DIMENSIONS.RECOVERIES].value;
-    value[DIMENSIONS.RECOVERIES].log = safeLog(value[DIMENSIONS.RECOVERIES].value);
-    value[DIMENSIONS.RECOVERIES].logPercent = (value[DIMENSIONS.RECOVERIES].log / maxRecoveriesLog) * 100;
     value[DIMENSIONS.DEATHS].diff = value[DIMENSIONS.DEATHS].value - previousValue[DIMENSIONS.DEATHS].value;
     value[DIMENSIONS.DEATHS].log = safeLog(value[DIMENSIONS.DEATHS].value);
     value[DIMENSIONS.DEATHS].logPercent = (value[DIMENSIONS.DEATHS].log / maxDeathsLog) * 100;
+    value[DIMENSIONS.RECOVERIES].diff = value[DIMENSIONS.RECOVERIES].value - previousValue[DIMENSIONS.RECOVERIES].value;
+    value[DIMENSIONS.RECOVERIES].log = safeLog(value[DIMENSIONS.RECOVERIES].value);
+    value[DIMENSIONS.RECOVERIES].logPercent = (value[DIMENSIONS.RECOVERIES].log / maxRecoveriesLog) * 100;
     formatted.push(value);
     previousValue = value;
   });
